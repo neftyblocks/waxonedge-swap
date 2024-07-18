@@ -4,15 +4,11 @@
 
 The world's most powerful swap component powered by WaxOnEdge + NeftyBlocks.
 
-[![npm bundle size](https://img.shields.io/bundlephobia/min/@waxonedge/swap?style=flat)](https://www.npmjs.org/package/@waxonedge/swap)
-[![npm](https://img.shields.io/npm/dw/@waxonedge/swap?style=flat)](https://www.npmjs.org/package/@waxonedge/swap)
-[![npm](https://img.shields.io/npm/v/@waxonedge/swap?style=flat)](https://www.npmjs.org/package/@waxonedge/swap)
+the root of this project is for development of the component.
 
-> ⚠️ This component is still in development and we will change how it works until we have hit a stable V1.0.0.
+the source code is in `swap/`
 
-# Project Structure
-
-the root of this project is for development of the swap component. the source code is in the `swap` folder. [swap readme](./swap/README.md)
+check the [swap readme](./swap/README.md)
 
 # Development
 
@@ -37,7 +33,7 @@ go to [localhost:5173](http://localhost:5173/)
     $ pnpm build
 ```
 
-# Publish
+### Publish
 
 publishing to npm is done through GitHub actions, create a new tag with the last version and push it.
 
