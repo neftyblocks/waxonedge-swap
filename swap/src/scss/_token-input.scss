@@ -1,0 +1,61 @@
+.token-field {
+    display: flex;
+    align-items: center;
+    gap: var(--space);
+    width: 100%;
+    margin-bottom: var(--spacing);
+    background-color: var(--input);
+    border: 1px solid var(--input-border);
+    border-radius: calc(var(--radius) * 0.5);
+    padding: var(--space) var(--space);
+    position: relative;
+
+    &--tax {
+        margin-bottom: 0;
+    }
+
+    input {
+        width: 100%;
+        height: calc(var(--space) * 5);
+        font-size: calc(var(--font-m) * 0.9);
+        font-weight: 700;
+        outline: none;
+        color: var(--input-color);
+        background-color: var(--input);
+        border: none;
+        text-align: right;
+    }
+
+    .btn {
+        gap: var(--space);
+        padding: calc(var(--space) * 0.2);
+        padding-left: calc(var(--space) * 0.4);
+        background-color: var(--shadow);
+
+        img {
+            width: calc(var(--space) * 2.5);
+            height: calc(var(--space) * 2.5);
+            max-width: none;
+        }
+
+        small {
+            display: block;
+            transform: translateY(1px);
+            font-size: var(--font-s);
+            line-height: 1;
+        }
+
+        svg {
+            max-width: none;
+            max-height: none;
+        }
+    }
+}
+
+.field-hint {
+    color: var(--color-subtle);
+    position: absolute;
+    bottom: 0;
+    font-size: var(--font-s);
+    right: var(--space);
+}

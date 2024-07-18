@@ -1,0 +1,35 @@
+.skeleton {
+    display: block;
+    background-color: var(--shadow);
+    border-radius: calc(var(--radius) * 0.5);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-input {
+    width: 100%;
+    height: calc(var(--space) * 7.2);
+    margin-bottom: var(--spacing);
+}
+
+.skeleton-field {
+    width: 100%;
+    height: calc(var(--space) * 5);
+}
+
+.skeleton-chart {
+    width: 100%;
+    border-radius: var(--radius);
+    height: calc(var(--space) * 10.7);
+    margin-top: var(--space);
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}

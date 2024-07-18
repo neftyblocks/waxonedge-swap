@@ -1,0 +1,26 @@
+name: Publish
+
+on:
+    push:
+        tags:
+            - v**
+
+jobs:
+    publish:
+        environment: Releases
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: 9
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  registry-url: "https://registry.npmjs.org"
+            - name: Install dependencies
+              run: pnpm install
+            - name: Publish
+              run: pnpm pub --no-git-checks
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,0 +1,38 @@
+.chart {
+    width: 100%;
+    padding: calc(var(--spacing) * 0.5);
+    padding-top: calc(var(--spacing) * 0.25);
+    margin-top: var(--space);
+    background-color: var(--bg);
+    color: var(--color);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    p {
+        font-size: var(--font-s);
+    }
+
+    button {
+        display: flex;
+        align-items: center;
+        gap: calc(var(--space) * 0.5);
+        color: var(--color-subtle);
+        font-size: var(--font-s);
+
+        svg {
+            width: calc(var(--space) * 1.5);
+            height: calc(var(--space) * 1.5);
+            transform: rotate(90deg) translateX(-1px);
+        }
+
+        &:hover {
+            color: var(--highlight);
+        }
+    }
+}

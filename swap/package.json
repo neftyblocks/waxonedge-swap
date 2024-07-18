@@ -1,0 +1,31 @@
+{
+    "name": "@waxonedge/swap",
+    "private": false,
+    "version": "0.4.3",
+    "type": "module",
+    "browser": "dist/main.cjs",
+    "module": "dist/main.mjs",
+    "exports": {
+        ".": {
+            "require": "./dist/main.cjs",
+            "default": "./dist/main.mjs"
+        },
+        "./dist/vueless": {
+            "require": "./dist/vueless.cjs",
+            "default": "./dist/vueless.mjs"
+        }
+    },
+    "author": {
+        "name": "WaxOneEdge",
+        "email": "contact@waxonedge.app",
+        "url": "https://waxonedge.app/"
+    },
+    "contributors": [
+        "Max van der Schee"
+    ],
+    "scripts": {
+        "dev": "vite",
+        "build": "vue-tsc --noEmit && vite build",
+        "build-vueless": "vue-tsc --noEmit && vite build --config vite.config-vueless.ts"
+    }
+}

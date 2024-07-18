@@ -1,0 +1,57 @@
+.btn-clear {
+    display: inline-block;
+    border: none;
+    background-color: transparent;
+    outline: none;
+    cursor: pointer;
+
+    &:active,
+    &:focus {
+        outline: none;
+    }
+}
+
+.btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: var(--btn-color);
+    font-size: var(--font);
+    border-radius: calc(var(--radius) * 2);
+    padding: calc(var(--space) * 0.8);
+    outline: none;
+    line-height: 1.4;
+    background-color: var(--btn);
+    border: 1px solid var(--btn-border);
+    cursor: pointer;
+    transition: background-color 0.16s, color 0.16s, transform 0.16s, border-color 0.16s;
+
+    > svg {
+        width: calc(var(--space) * 1.5);
+        height: calc(var(--space) * 1.5);
+    }
+
+    &:hover {
+        text-decoration: none;
+        border-color: var(--btn-color);
+    }
+
+    &:active {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    &--center {
+        margin: 0 auto;
+    }
+
+    &--big {
+        padding: calc(var(--space) * 1) calc(var(--space) * 2.4);
+    }
+}
