@@ -187,8 +187,8 @@
 import { useTokenDisplay } from "@nefty/use";
 import { onClickOutside, useDebounceFn } from "@vueuse/core";
 import { type PropType, computed, ref, watch } from "vue";
-import { useAccount, useEndpointsConfig, useSwap } from "../composables";
-import type { EndpointsConfig, TokenList, Wallet } from "../types";
+import { useAccount, useConfig, useSwap } from "../composables";
+import type { Config, TokenList, Wallet } from "../types";
 import { prettyFormatNumber } from "../utils";
 
 import { useCandles } from "../composables/candle";
@@ -211,7 +211,7 @@ const props = defineProps({
     },
     chart: {
         type: [String, Boolean],
-        default: true,
+        default: false,
     },
     wallet: {
         type: [String, Object] as PropType<string | Wallet>,
@@ -221,16 +221,12 @@ const props = defineProps({
         type: [String, Object] as PropType<string | Lock>,
         default: null,
     },
-    preset: {
-        type: String,
-        default: "",
-    },
     swapping: {
         type: [String, Boolean],
         default: false,
     },
-    endpoints: {
-        type: [String, Object] as PropType<string | EndpointsConfig>,
+    config: {
+        type: [String, Object] as PropType<string | Config>,
         required: false,
     },
 });
@@ -251,19 +247,19 @@ const outputValue = ref();
 const actionsRaw = ref([]);
 const inverted = ref(false);
 const taxAmount = ref(0);
-const [, setEndpointsConfig] = useEndpointsConfig();
+const [, setConfig] = useConfig();
 
-const normalizedEndpoints = computed(() => {
-    if (typeof props.endpoints === "string") return JSON.parse(props.endpoints);
-    return props.endpoints;
+const normalizedConfig = computed(() => {
+    if (typeof props.config === "string") return JSON.parse(props.config);
+    return props.config;
 });
 
-if (normalizedEndpoints.value) {
-    setEndpointsConfig(normalizedEndpoints.value);
+if (normalizedConfig.value) {
+    setConfig(normalizedConfig.value);
 }
 
-watch(normalizedEndpoints, (value) => {
-    if (value) setEndpointsConfig(value);
+watch(normalizedConfig, (value) => {
+    if (value) setConfig(value);
 });
 
 const normalizedChart = computed(() => {
@@ -300,7 +296,6 @@ const filterLock = computed<string[] | undefined>(() => {
 });
 
 const { loadingInit, loadingRoute, selectedPair, conversion, settings, getRoute, getPairId, updateWaxPrice } = useSwap(
-    props.preset,
     normalizedLock.value
 );
 const { getLastPrice } = useCandles();

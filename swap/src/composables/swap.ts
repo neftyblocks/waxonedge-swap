@@ -2,7 +2,7 @@ import { useFetch, useImageUrl } from "@nefty/use";
 import { computed, onBeforeMount, ref } from "vue";
 import type { Lock, Settings, TableRowsApi, TokenItem, TokenList } from "../types";
 import { limitPrecision } from "../utils";
-import { useEndpointsConfig } from "./config";
+import { useConfig } from "./config";
 
 const selectedPair = ref<TokenList | null>(null);
 const inputWaxPrice = ref(0);
@@ -23,16 +23,16 @@ const waxConversion = ref<number>(0);
 let controller: AbortController | null = null;
 let signal: AbortSignal | undefined = undefined;
 
-export const useSwap = (preset?: string, lock?: Lock) => {
+export const useSwap = (lock?: Lock) => {
     const loadingInit = ref(true);
     const loadingRoute = ref(false);
-    const [config] = useEndpointsConfig();
+    const [config] = useConfig();
 
     onBeforeMount(async () => {
         const locked = [lock?.out, lock?.in].filter(Boolean).join(",");
 
         const [tokenP, usdP] = await Promise.allSettled([
-            getTokenList({ limit: 1, preset: lock ? locked : preset }),
+            getTokenList({ limit: 1, preset: lock ? locked : "" }),
             getUsdRate(),
         ]);
 
@@ -157,7 +157,7 @@ export const useSwap = (preset?: string, lock?: Lock) => {
 
 // biome-ignore lint/suspicious/noExplicitAny:
 export const getTokenList = async (params: null | any = null): Promise<TokenList[]> => {
-    const [config] = useEndpointsConfig();
+    const [config] = useConfig();
     const { data, error } = await useFetch<TokenList[]>("/api/waxonedge/tokens", {
         baseUrl: config.RATES_API,
         params: {
@@ -186,7 +186,7 @@ export const useTokenUrl = (token_url: string) => {
 // ====================
 
 const getUsdRate = async (): Promise<number> => {
-    const [config] = useEndpointsConfig();
+    const [config] = useConfig();
     const { data, error } = await useFetch<TableRowsApi>("/v1/chain/get_table_rows", {
         baseUrl: config.CHAIN_API,
         method: "POST",

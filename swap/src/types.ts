@@ -97,7 +97,7 @@ export type TableRowsApi = {
     next_key: string;
 };
 
-export type EndpointsConfig = {
+export type Config = {
     API: string;
     RATES_API: string;
     CHAIN_API: string;
