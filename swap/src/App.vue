@@ -25,7 +25,10 @@ customElements.define("waxonedge-swap", SwapElement);
 
 const wallet = ref<Wallet | null>(null);
 
-const locked = {};
+const locked = {
+    in: "usdt.alcor_USDT,token.nefty_NEFTY,eosio.token_WAX",
+    out: "usdt.alcor_USDT,token.nefty_NEFTY,eosio.token_WAX",
+};
 
 const swapping = ref(false);
 

@@ -1,7 +1,7 @@
 import { useFetch } from "@nefty/use";
 import { type Ref, ref, watch } from "vue";
 import type { BalanceAPI, Balances, TokenItem, Wallet } from "../types";
-import { useEndpointsConfig } from "./config";
+import { useConfig } from "./config";
 
 const balances = ref<Balances | null>(null);
 
@@ -54,7 +54,7 @@ export const useAccount = (wallet: Ref<Wallet | null>) => {
 
 const getBalances = async (accountName: string): Promise<Balances> => {
     const result: Balances = {};
-    const [config] = useEndpointsConfig();
+    const [config] = useConfig();
 
     const { data, error } = await useFetch<BalanceAPI[]>("/api/balances/wax", {
         baseUrl: config.RATES_API,

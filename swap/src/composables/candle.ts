@@ -1,12 +1,12 @@
 import { useFetch } from "@nefty/use";
 import { ref } from "vue";
 import type { OHLCVCustom } from "../types";
-import { useEndpointsConfig } from "./config";
+import { useConfig } from "./config";
 
 const cache = ref<Record<string, OHLCVCustom[]>>({});
 
 export const useCandles = () => {
-    const [config] = useEndpointsConfig();
+    const [config] = useConfig();
     const getCandle = async (exchange: string, pair: string) => {
         const id = `${exchange}-${pair.toString}`;
         const now = Date.now();
