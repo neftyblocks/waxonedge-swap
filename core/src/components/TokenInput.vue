@@ -1,8 +1,8 @@
 <template>
-    <div v-if="token" class="token-field">
+    <div class="token-field" :class="{ 'token-field--tax': taxAmount }">
         <button class="btn" @click="$emit('click')">
             <img :src="useTokenUrl(token?.logo)" alt="" width="25" height="25" />
-            <small>{{ token?.ticker }}</small>
+            <small>{{ token?.ticker || "Select" }}</small>
             <svg role="presentation" focusable="false" aria-hidden="true">
                 <use xlink:href="#woe-chevron_down" />
             </svg>
@@ -11,16 +11,23 @@
         <input
             v-else
             type="text"
-            :disabled="!isInput"
+            :disabled="!isInput || !token"
             autocomplete="off"
             v-model="amount"
             :placeholder="isInput ? '0.00' : undefined"
             @input="$emit('input')"
         />
         <small v-if="!loading && amount" class="field-hint">
-            {{ displayUSD }} {{ prettyFormatNumber(amount ? +amount : 0) }} {{ token.ticker }}
+            <template v-if="token">
+                {{ displayUSD }} {{ prettyFormatNumber(amount ? +amount : 0) }} {{ token.ticker }}
+            </template>
+            <template v-else> {{ displayUSD }} --- </template>
         </small>
     </div>
+    <small v-if="amount && taxAmount && token" class="swap-tax"
+        >total cost: {{ prettyFormatNumber(+amount) }} {{ token.ticker }} + {{ prettyFormatNumber(taxAmount) }}
+        {{ token.ticker }} ({{ prettyFormatNumber(token.tax * 100) }}% fee)
+    </small>
 </template>
 
 <script setup lang="ts">
@@ -60,6 +67,13 @@ const props = defineProps({
 
 const emit = defineEmits(["input", "click"]);
 
+const taxAmount = computed(() => {
+    if (!amount.value) return 0;
+    if (!token.value) return 0;
+
+    return +amount.value * token.value.tax;
+});
+
 const displayUSD = computed(() => {
     if (!props.conversion || props.conversion === 0) return "";
     if (!amount.value) return "";
@@ -67,11 +81,15 @@ const displayUSD = computed(() => {
     return `${useTokenDisplay(+amount.value * props.conversion, 2)} USD ≈`;
 });
 
-const formatNumber = (value: string): number => {
+const formatNumber = (value: string): string | number => {
     let formatValue = value.replace(/\s/g, "");
     formatValue = formatValue.replace(/,/g, ".");
     formatValue = formatValue.replace(/[^0-9.]/g, "");
+    const numericValue = +formatValue;
+    if (Number.isNaN(numericValue)) {
+        return formatValue;
+    }
 
-    return +formatValue;
+    return numericValue;
 };
 </script>

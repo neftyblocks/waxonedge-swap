@@ -1,7 +1,7 @@
 {
-    "name": "waxonedge-swap",
+    "name": "waxonedge-components",
     "type": "module",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "private": true,
     "author": {
         "name": "NeftyBlocks",
@@ -10,21 +10,29 @@
     },
     "scripts": {
         "lint": "biome check .",
-        "dev": "cd swap && pnpm dev",
-        "build": "cd swap && pnpm build && pnpm build-vueless",
-        "pub": "pnpm build && cd swap && pnpm publish --access public"
+        "swap": "pnpm build:core && cd swap && pnpm dev",
+        "liquidity": "pnpm build:core && cd liquidity && pnpm dev",
+        "build": "pnpm build:core && pnpm build:swap && pnpm build:liquidity",
+        "build:swap": "cd swap && pnpm build && pnpm build-vueless",
+        "build:liquidity": "cd liquidity && pnpm build && pnpm build-vueless",
+        "build:core": "cd core && pnpm build",
+        "pub:swap": "pnpm build:core && pnpm build:swap && cd swap && pnpm publish --access public",
+        "pub:liquidity": "pnpm build:core && pnpm build:liquidity && cd liquidity && pnpm publish --access public"
     },
     "dependencies": {
         "vue": "^3.4.32",
-        "@nefty/use": "^0.2.0"
+        "@nefty/use": "^0.2.0",
+        "waxonedge-core": "workspace:^"
     },
     "devDependencies": {
         "@biomejs/biome": "^1.8.3",
         "@vitejs/plugin-vue": "^5.0.5",
+        "glob": "^11.0.0",
         "sass": "^1.77.8",
         "typescript": "^5.5.3",
         "vite": "^5.3.4",
         "vue-tsc": "^2.0.26",
+        "vite-plugin-dts": "^3.9.1",
         "@vueuse/core": "^10.11.0"
     },
     "engines": {

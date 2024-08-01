@@ -1,8 +1,7 @@
-import { useFetch, useImageUrl } from "@nefty/use";
+import { useFetch } from "@nefty/use";
 import { computed, onBeforeMount, ref } from "vue";
-import type { Lock, Settings, TableRowsApi, TokenItem, TokenList } from "../types";
-import { limitPrecision } from "../utils";
-import { useConfig } from "./config";
+import type { Lock, Settings, TokenItem, TokenList } from "waxonedge-core";
+import { useConfig, useCandles, getPairSources, getTokenList } from "waxonedge-core";
 
 const selectedPair = ref<TokenList | null>(null);
 const inputWaxPrice = ref(0);
@@ -27,6 +26,7 @@ export const useSwap = (lock?: Lock) => {
     const loadingInit = ref(true);
     const loadingRoute = ref(false);
     const [config] = useConfig();
+    const { getUsdRate } = useCandles();
 
     onBeforeMount(async () => {
         const locked = [lock?.out, lock?.in].filter(Boolean).join(",");
@@ -115,19 +115,6 @@ export const useSwap = (lock?: Lock) => {
         return null;
     };
 
-    const getPairId = async (in_symbol_contract: string, out_symbol_contract: string): Promise<string | undefined> => {
-        // biome-ignore lint/suspicious/noExplicitAny:
-        const { data, error } = await useFetch<any>(`/pairDirectSources/${in_symbol_contract}/${out_symbol_contract}`, {
-            baseUrl: config.API,
-        });
-
-        if (!error && data?.length) {
-            return data[0].pair_id;
-        }
-
-        return undefined;
-    };
-
     const updateWaxPrice = async (contract: string, ticker: string, input: boolean) => {
         const { data, error } = await useFetch<{ wax_price: number }>(`/wax_price/${contract}/${ticker}`, {
             baseUrl: config.API,
@@ -141,6 +128,9 @@ export const useSwap = (lock?: Lock) => {
         else outputWaxPrice.value = wax_price;
     };
 
+    const getPairId = async (in_symbol_contract: string, out_symbol_contract: string) =>
+        (await getPairSources(in_symbol_contract, out_symbol_contract))[0]?.pair_id;
+
     return {
         loadingInit,
         loadingRoute,
@@ -153,62 +143,4 @@ export const useSwap = (lock?: Lock) => {
         getPairId,
         updateWaxPrice,
     };
-};
-
-// biome-ignore lint/suspicious/noExplicitAny:
-export const getTokenList = async (params: null | any = null): Promise<TokenList[]> => {
-    const [config] = useConfig();
-    const { data, error } = await useFetch<TokenList[]>("/api/waxonedge/tokens", {
-        baseUrl: config.RATES_API,
-        params: {
-            ...params,
-            chain: config.CHAIN,
-        },
-    });
-
-    if (!error && data) {
-        return data;
-    }
-
-    return [];
-};
-
-export const useTokenUrl = (token_url: string) => {
-    let checkedUrl = token_url;
-
-    if (!token_url) checkedUrl = "https://neftyblocks.com/tokens/unknown.png";
-
-    return useImageUrl(checkedUrl, 100, true);
-};
-
-// ====================
-//  HELPER FUNCTIONS
-// ====================
-
-const getUsdRate = async (): Promise<number> => {
-    const [config] = useConfig();
-    const { data, error } = await useFetch<TableRowsApi>("/v1/chain/get_table_rows", {
-        baseUrl: config.CHAIN_API,
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: {
-            json: true,
-            index_position: 3,
-            key_type: "i64",
-            code: "delphioracle",
-            scope: "waxpusd",
-            table: "datapoints",
-            limit: 1,
-            reverse: true,
-            show_payer: false,
-        },
-    });
-
-    if (!error && data) {
-        const { rows } = data;
-
-        return rows[0] ? limitPrecision(rows[0].median / 10000) : 0;
-    }
-
-    return 0;
 };

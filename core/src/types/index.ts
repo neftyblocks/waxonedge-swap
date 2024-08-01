@@ -61,6 +61,8 @@ export type BalanceAPI = {
     currency: string;
     decimals: string;
     usdValue: string;
+    tax: number;
+    logo: string;
 };
 
 // use: contract_symbol as key
@@ -68,6 +70,7 @@ export type Balances = Record<string, Balance>;
 export type Balance = {
     amount: number;
     usdValue: number;
+    token: TokenItem;
 };
 
 export type OHLCVCustom = {
@@ -96,6 +99,27 @@ export type TableRowsApi = {
     more: boolean;
     next_key: string;
 };
+
+export type PairSource = {
+    src: string;
+    src_type: string;
+    pair_id: string;
+    token0: PairToken;
+    token1: PairToken;
+    fee: number;
+    sqrtPriceX64?: string;
+};
+
+export interface PairToken {
+    symbol: PairSymbol;
+    amount: number;
+    contract: string;
+}
+
+export interface PairSymbol {
+    ticker: string;
+    precision: number;
+}
 
 export type Config = {
     API: string;

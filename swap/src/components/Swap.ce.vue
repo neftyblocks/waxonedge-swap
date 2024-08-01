@@ -51,16 +51,9 @@
                 :conversion="conversion.in"
                 v-model:token="selectedPair!.in"
                 :loading="loadingRoute || loading"
-                :class="{ 'token-field--tax': taxAmount }"
                 @input="hasInputUpdate"
                 @click="triggerModal('in')"
             />
-            <small v-if="taxAmount" class="swap-tax"
-                >total cost: {{ prettyFormatNumber(inputValue) }} {{ selectedPair!.in.ticker }} +
-                {{ prettyFormatNumber(taxAmount) }} {{ selectedPair!.in.ticker }} ({{
-                    prettyFormatNumber(selectedPair!.in.tax * 100)
-                }}% fee)
-            </small>
             <button class="btn btn--center" @click="switchSelected">
                 <svg role="presentation" focusable="false" aria-hidden="true">
                     <use xlink:href="#woe-swap" />
@@ -89,31 +82,16 @@
             <button
                 v-if="normalizedWallet"
                 class="btn btn--center btn--big"
-                :disabled="normalizedSwapping || !outputValue"
+                :disabled="normalizedSigning || !outputValue"
                 @click="swapToken"
             >
-                {{ !outputValue ? "waiting for input" : normalizedSwapping ? "Signing..." : "Swap" }}
+                {{ !outputValue ? "waiting for input" : normalizedSigning ? "Signing..." : "Swap" }}
             </button>
             <button v-else class="btn btn--center btn--big" @click="emit('connect')">Connect wallet</button>
         </section>
         <section class="swap-info" part="swap-info">
             <header>
-                <button class="btn-clear" v-if="selectedPair" @click="flip = !flip">
-                    1 {{ flip ? selectedPair.out.ticker : selectedPair.in.ticker }} ≈
-                    {{
-                        lastPrice
-                            ? flip
-                                ? useTokenDisplay(1 / lastPrice, selectedPair.in.precision)
-                                : useTokenDisplay(lastPrice, selectedPair.out.precision)
-                            : 0
-                    }}
-                    {{ flip ? selectedPair.in.ticker : selectedPair.out.ticker }}
-
-                    <svg role="presentation" focusable="false" aria-hidden="true">
-                        <use xlink:href="#woe-swap" />
-                    </svg>
-                </button>
-
+                <PairPrice v-if="selectedPair" :selected-pair="selectedPair" :price="lastPrice" />
                 <button
                     v-if="selectedPair"
                     class="btn-clear"
@@ -185,18 +163,23 @@
 
 <script setup lang="ts">
 import { useTokenDisplay } from "@nefty/use";
-import { onClickOutside, useDebounceFn } from "@vueuse/core";
+import { onClickOutside, toRefs, useDebounceFn } from "@vueuse/core";
 import { type PropType, computed, ref, watch } from "vue";
-import { useAccount, useConfig, useSwap } from "../composables";
-import type { Config, TokenList, Wallet } from "../types";
-import { prettyFormatNumber } from "../utils";
-
-import { useCandles } from "../composables/candle";
-import Chart from "./Chart.vue";
-// Components
-import Sprite from "./Sprite.vue";
-import TokenInput from "./TokenInput.vue";
-import TokenModal from "./TokenModal.vue";
+import { useSwap } from "../composables/swap";
+import type { Config, TokenItem, Wallet } from "waxonedge-core";
+import {
+    getTransferAmount,
+    prettyFormatNumber,
+    normalizedBoolean,
+    normalizedObject,
+    useAccount,
+    useConfig,
+    useCandles,
+    Sprite,
+    TokenInput,
+    TokenModal,
+    PairPrice,
+} from "waxonedge-core";
 
 const emit = defineEmits<{
     connect: [];
@@ -225,6 +208,10 @@ const props = defineProps({
         type: [String, Boolean],
         default: false,
     },
+    signing: {
+        type: [String, Boolean],
+        default: false,
+    },
     config: {
         type: [String, Object] as PropType<string | Config>,
         required: false,
@@ -232,8 +219,7 @@ const props = defineProps({
 });
 
 const showModal = ref(false);
-const flip = ref(false);
-const showPriceInfo = ref(false);
+const showPriceInfo = ref(true);
 const showSettings = ref(false);
 const settingsModal = ref();
 const loading = ref(false);
@@ -246,53 +232,20 @@ const inputValue = ref();
 const outputValue = ref();
 const actionsRaw = ref([]);
 const inverted = ref(false);
-const taxAmount = ref(0);
-const [, setConfig] = useConfig();
 
-const normalizedConfig = computed(() => {
-    if (typeof props.config === "string") return JSON.parse(props.config);
-    return props.config;
-});
+// Normalize
+const { wallet, lock, signing, swapping, chart, config } = toRefs(props);
+const normalizedChart = normalizedBoolean(chart);
+const normalizedSigning = normalizedBoolean(signing || swapping);
+const normalizedWallet = normalizedObject<Wallet>(wallet);
+const normalizedLock = normalizedObject<any>(lock);
 
-if (normalizedConfig.value) {
-    setConfig(normalizedConfig.value);
-}
-
-watch(normalizedConfig, (value) => {
-    if (value) setConfig(value);
-});
-
-const normalizedChart = computed(() => {
-    if (typeof props.chart === "string") return props.chart === "true" ? true : props.chart === "" ? true : false;
-
-    return props.chart;
-});
-
-const normalizedSwapping = computed(() => {
-    if (typeof props.swapping === "string")
-        return props.swapping === "true" ? true : props.swapping === "" ? true : false;
-
-    return props.swapping;
-});
-
-const normalizedWallet = computed(() => {
-    if (!props.wallet) return null;
-    else {
-        if (typeof props.wallet === "string") return JSON.parse(props.wallet);
-
-        return props.wallet;
-    }
-});
-
-const normalizedLock = computed(() => {
-    if (typeof props.lock === "string") return JSON.parse(props.lock);
-    return props.lock;
-});
+useConfig(config);
 
 const filterLock = computed<string[] | undefined>(() => {
     const inOut = inverted.value ? ["out", "in"] : ["in", "out"];
     const select = inOut[whichTokenToUpdate.value === "in" ? 0 : 1];
-    return normalizedLock.value ? normalizedLock.value[select]?.split(",") : undefined;
+    return normalizedLock.value ? normalizedLock.value?.[select]?.split(",") : undefined;
 });
 
 const { loadingInit, loadingRoute, selectedPair, conversion, settings, getRoute, getPairId, updateWaxPrice } = useSwap(
@@ -305,8 +258,8 @@ onClickOutside(settingsModal, () => {
     showSettings.value = false;
 });
 
-watch(normalizedSwapping, () => {
-    if (!loadingInit.value && !normalizedSwapping.value) {
+watch(normalizedSigning, () => {
+    if (!loadingInit.value && !normalizedSigning.value) {
         inputValue.value = undefined;
         outputValue.value = undefined;
         actionsRaw.value = [];
@@ -338,7 +291,7 @@ const triggerModal = (token: "in" | "out") => {
     showModal.value = true;
 };
 
-const setNewToken = async (token: TokenList) => {
+const setNewToken = async (token: TokenItem) => {
     if (!selectedPair.value) return;
 
     outputValue.value = undefined;
@@ -349,21 +302,24 @@ const setNewToken = async (token: TokenList) => {
     selectedPair.value = null;
 
     const updateInput = whichTokenToUpdate.value === "in";
+    let previousSelection;
     if (updateInput) {
+        previousSelection = clone.in;
         inputValue.value = undefined;
-        clone.in = token.in;
+        clone.in = token;
     } else {
-        clone.out = token.in;
+        previousSelection = clone.out;
+        clone.out = token;
     }
 
-    // Reset selection when selecting the same token
+    // Reverse selection when selecting the same token
     const isSameToken = clone.in.ticker === clone.out.ticker && clone.in.contract === clone.out.contract;
     if (isSameToken && updateInput) {
-        clone.in = token.in;
-        clone.out = token.out;
+        clone.out = previousSelection;
+        clone.in = token;
     } else if (isSameToken) {
-        clone.out = token.in;
-        clone.in = token.out;
+        clone.in = previousSelection;
+        clone.out = token;
     }
 
     selectedPair.value = clone;
@@ -398,24 +354,19 @@ const setSlippage = (e: Event) => {
 const hasInputUpdate = useDebounceFn(async () => {
     if (!inputValue.value || inputValue.value === 0) {
         outputValue.value = undefined;
-        taxAmount.value = 0;
         fees.value = 0;
         minimumReceived.value = 0;
         priceImpact.value = 0;
-    } else {
+    } else if (selectedPair.value) {
+        const { adjustedAmount } = getTransferAmount(
+            inputValue.value,
+            getBalanceByToken(selectedPair.value.in),
+            selectedPair.value.in.tax
+        );
+
         // deref input
         let inputAmount = inputValue.value;
-
-        if (selectedPair.value?.in.tax) {
-            const balance = getBalanceByToken(selectedPair.value!.in);
-            const total = balance / (1 + selectedPair.value?.in.tax);
-
-            taxAmount.value = inputAmount * selectedPair.value?.in.tax;
-
-            if (balance <= inputAmount + taxAmount.value) {
-                inputAmount = total;
-            }
-        }
+        inputAmount = adjustedAmount;
 
         const route = await getRoute(inputAmount, normalizedWallet.value?.accountName || "");
 
@@ -455,7 +406,6 @@ const switchSelected = async () => {
 
         inputValue.value = outputValue.value;
         outputValue.value = undefined;
-        taxAmount.value = 0;
 
         selectedPair.value = clone;
 
@@ -473,18 +423,19 @@ const refresh = async () => {
 };
 
 const swapToken = () => {
-    if (actionsRaw.value.length === 0 && !normalizedWallet.value && !selectedPair.value) return;
+    const wallet = normalizedWallet.value;
+    if (actionsRaw.value.length === 0 || !wallet || !selectedPair.value) return;
 
     const authorization = [
         {
-            actor: normalizedWallet.value.accountName,
-            permission: normalizedWallet.value.permission,
+            actor: wallet.accountName,
+            permission: wallet.permission,
         },
     ];
 
     const removeRef = actionsRaw.value.map((action: Object) => {
         return {
-            from: normalizedWallet.value.accountName,
+            from: wallet.accountName,
             ...action,
         };
     });
@@ -514,128 +465,5 @@ const swapToken = () => {
 </script>
 
 <style lang="scss">
-@import "./../scss/style.scss";
-
-:host {
-    --index: var(--waxonedge-index, 0);
-    // space is equal to 10px
-    --space: var(--waxonedge-space, 0.625rem);
-    --space-x: calc(var(--space) * 10);
-
-    --spacing: calc(var(--space) * 2.4);
-    --radius: calc(var(--space) * 1.2);
-
-    // font sizing
-    --font-s: calc(var(--font) * 0.85);
-    --font: var(--waxonedge-font, 0.9rem);
-    --font-m: calc(var(--font) * 1.85);
-
-    // style
-    --theme-bg: var(--waxonedge-bg, #1c2128);
-    --theme-bg-inverted: var(--waxonedge-bg-inverted, #e3e3e3);
-
-    --theme-shadow: var(--waxonedge-shadow, rgba(255, 255, 255, 0.1));
-    --theme-shadow-modal: var(--waxonedge-shadow-modal, rgba(0, 0, 0, 0.5));
-    --theme-shadow-inverted: var(--waxonedge-shadow-inverted, rgba(0, 0, 0, 0.1));
-
-    --theme-highlight: var(--waxonedge-highlight, #10e994);
-
-    --theme-success: var(--waxonedge-success, #12de8d);
-    --theme-error: var(--waxonedge-error, #cd1313);
-    --theme-neutral: var(--waxonedge-neutral, #757f91);
-
-    --theme-green: var(--waxonedge-green, #10e994);
-    --theme-yellow: var(--waxonedge-yellow, #f7d700);
-    --theme-orange: var(--waxonedge-orange, #f79800);
-    --theme-red: var(--waxonedge-red, #cd1313);
-
-    --theme-color: var(--waxonedge-color, #dce1ea);
-    --theme-color-subtle: var(--waxonedge-color-subtle, #757f91);
-    --theme-color-inverted: var(--waxonedge-color-inverted, #1c2128);
-    --theme-color-subtle-inverted: var(--waxonedge-color-subtle-inverted, #535c69);
-
-    --theme-border: var(--waxonedge-border, #344150);
-    --theme-border-inverted: var(--waxonedge-border-inverted, #b6b6b6);
-
-    // input
-    --theme-input: var(--waxonedge-input, #1c2128);
-    --theme-input-color: var(--waxonedge-input-color, #dce1ea);
-    --theme-input-border: var(--waxonedge-input-border, #344150);
-
-    --theme-input-inverted: var(--waxonedge-input-inverted, #ffffff);
-    --theme-input-color-inverted: var(--waxonedge-input-color-inverted, #1c2128);
-    --theme-input-border-inverted: var(--waxonedge-input-border-inverted, #b6b6b6);
-
-    // btn
-    --theme-btn: var(--waxonedge-btn, #1c2128);
-    --theme-btn-color: var(--waxonedge-btn-color, #dce1ea);
-    --theme-btn-border: var(--waxonedge-btn-border, #344150);
-
-    --theme-btn-inverted: var(--waxonedge-btn-inverted, #fafafa);
-    --theme-btn-color-inverted: var(--waxonedge-btn-color-inverted, #1c2128);
-    --theme-btn-border-inverted: var(--waxonedge-btn-border-inverted, #b6b6b6);
-
-    font-family: sans-serif;
-}
-
-main {
-    width: calc(var(--space-x) * 2.5);
-    z-index: var(--index);
-    position: relative;
-
-    --highlight: var(--theme-highlight);
-    --success: var(--theme-success);
-    --error: var(--theme-error);
-    --neutral: var(--theme-neutral);
-    --green: var(--theme-green);
-    --yellow: var(--theme-yellow);
-    --orange: var(--theme-orange);
-    --red: var(--theme-red);
-
-    &.dark {
-        --bg: var(--theme-bg);
-        --color: var(--theme-color);
-        --color-subtle: var(--theme-color-subtle);
-        --border: var(--theme-border);
-        --shadow: var(--theme-shadow);
-        --shadow-modal: var(--theme-shadow-modal);
-
-        --btn: var(--theme-btn);
-        --btn-color: var(--theme-btn-color);
-        --btn-border: var(--theme-btn-border);
-
-        --input: var(--theme-input);
-        --input-color: var(--theme-input-color);
-        --input-border: var(--theme-input-border);
-    }
-
-    &.light {
-        --bg: var(--theme-bg-inverted);
-        --color: var(--theme-color-inverted);
-        --color-subtle: var(--theme-color-subtle-inverted);
-        --border: var(--theme-border-inverted);
-        --shadow: var(--theme-shadow-inverted);
-        --shadow-modal: var(--theme-shadow-modal);
-
-        --btn: var(--theme-btn-inverted);
-        --btn-color: var(--theme-btn-color-inverted);
-        --btn-border: var(--theme-btn-border-inverted);
-
-        --input: var(--theme-input-inverted);
-        --input-color: var(--theme-input-color-inverted);
-        --input-border: var(--theme-input-border-inverted);
-    }
-}
-
-@media all and (min-width: 350px) {
-    main {
-        width: calc(var(--space-x) * 3);
-    }
-}
-
-@media all and (min-width: 500px) {
-    main {
-        width: calc(var(--space-x) * 4);
-    }
-}
+@import "../scss/style.scss";
 </style>
