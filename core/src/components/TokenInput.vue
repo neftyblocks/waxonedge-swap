@@ -10,6 +10,7 @@
         <span v-if="!isInput && loading" class="skeleton skeleton-field"></span>
         <input
             v-else
+            ref="amountInput"
             type="text"
             :disabled="!isInput || !token"
             autocomplete="off"
@@ -32,11 +33,12 @@
 
 <script setup lang="ts">
 import { useTokenDisplay } from "@nefty/use";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useTokenUrl } from "../composables";
 import type { TokenItem } from "../types";
 import { prettyFormatNumber } from "../utils";
 
+const amountInput = ref<HTMLInputElement>();
 const token = defineModel<TokenItem>("token");
 const [amount, modifiers] = defineModel("amount", {
     get(v) {
@@ -51,7 +53,6 @@ const [amount, modifiers] = defineModel("amount", {
     set(value: string) {
         if (modifiers.token) {
             const data = formatNumber(value);
-
             return data;
         }
 
@@ -84,12 +85,12 @@ const displayUSD = computed(() => {
 const formatNumber = (value: string): string | number => {
     let formatValue = value.replace(/\s/g, "");
     formatValue = formatValue.replace(/,/g, ".");
+    formatValue = formatValue.replace(/\\.*/g, ".");
     formatValue = formatValue.replace(/[^0-9.]/g, "");
-    const numericValue = +formatValue;
-    if (Number.isNaN(numericValue)) {
+    const numericValue = parseFloat(formatValue);
+    if (Number.isNaN(numericValue) || formatValue.matchAll(/^.*\\.0*$/g)) {
         return formatValue;
     }
-
     return numericValue;
 };
 </script>

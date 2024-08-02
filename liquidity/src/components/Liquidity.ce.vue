@@ -356,11 +356,11 @@ const hasInputUpdate = (updateOutput = true) => {
     let shouldUpdateOutput = updateOutput;
     if (tokenIn.value && inputValue.value) {
         const { adjustedAmount, changed } = getTransferAmount(
-            inputValue.value,
+            +inputValue.value,
             getBalanceByToken(tokenIn.value),
             tokenIn.value.tax
         );
-        inputValue.value = adjustedAmount;
+        inputValue.value = limitPrecision(adjustedAmount, tokenIn.value?.precision);
         if (changed) {
             shouldUpdateOutput = true;
         }
@@ -369,7 +369,7 @@ const hasInputUpdate = (updateOutput = true) => {
     if (pairCalculationParameters.value && shouldUpdateOutput) {
         const { output } = calculateTokenPairAmounts({
             ...pairCalculationParameters.value,
-            input: inputValue.value,
+            input: +inputValue.value,
         });
         setOutputAmount(output, false);
     }
@@ -379,11 +379,11 @@ const hasOutputUpdate = (updateInput = true) => {
     let shouldUpdateInput = updateInput;
     if (tokenOut.value && outputValue.value) {
         const { adjustedAmount, changed } = getTransferAmount(
-            outputValue.value,
+            +outputValue.value,
             getBalanceByToken(tokenOut.value),
             tokenOut.value.tax
         );
-        outputValue.value = adjustedAmount;
+        outputValue.value = limitPrecision(adjustedAmount, tokenOut.value?.precision);
         if (changed) {
             shouldUpdateInput = true;
         }
@@ -392,7 +392,7 @@ const hasOutputUpdate = (updateInput = true) => {
     if (pairCalculationParameters.value && shouldUpdateInput) {
         const { input } = calculateTokenPairAmounts({
             ...pairCalculationParameters.value,
-            output: outputValue.value,
+            output: +outputValue.value,
         });
         setInputAmount(input, false);
     }
@@ -413,14 +413,14 @@ const matchPrice = (price: number) => {
     if (inputValue.value) {
         const { output } = calculateTokenPairAmounts({
             rate: selectedPairPrice.value,
-            input: inputValue.value,
+            input: +inputValue.value,
             inverted: selectedPair.value.inverted,
         });
         setOutputAmount(output, false);
     } else if (outputValue.value) {
         const { input } = calculateTokenPairAmounts({
             rate: selectedPairPrice.value,
-            output: outputValue.value,
+            output: +outputValue.value,
             inverted: selectedPair.value.inverted,
         });
         setInputAmount(input, false);
@@ -445,8 +445,8 @@ const switchSelected = async () => {
         inverted.value = !inverted.value;
         loading.value = true;
 
-        const newOutput = inputValue.value;
-        inputValue.value = outputValue.value;
+        const newOutput = +inputValue.value;
+        inputValue.value = +outputValue.value;
         outputValue.value = newOutput;
 
         const newTokenOut = tokenIn.value;
@@ -494,8 +494,8 @@ const addLiquidity = () => {
     const pairSource = selectedPair.value.source;
     const depositMemo = `deposit_to_pair:${poolKey}`;
 
-    const token1Quantity = numberToString(inputValue.value, pool1);
-    const token2Quantity = numberToString(outputValue.value, pool2);
+    const token1Quantity = numberToString(+inputValue.value, pool1);
+    const token2Quantity = numberToString(+outputValue.value, pool2);
 
     const token1ExtendedSymbol = {
         sym: `${pool1.precision},${pool1.ticker}`,

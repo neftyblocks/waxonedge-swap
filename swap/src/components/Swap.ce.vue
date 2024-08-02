@@ -352,20 +352,20 @@ const setSlippage = (e: Event) => {
 };
 
 const hasInputUpdate = useDebounceFn(async () => {
-    if (!inputValue.value || inputValue.value === 0) {
+    if (!inputValue.value || +inputValue.value === 0) {
         outputValue.value = undefined;
         fees.value = 0;
         minimumReceived.value = 0;
         priceImpact.value = 0;
     } else if (selectedPair.value) {
         const { adjustedAmount } = getTransferAmount(
-            inputValue.value,
+            +inputValue.value,
             getBalanceByToken(selectedPair.value.in),
             selectedPair.value.in.tax
         );
 
         // deref input
-        let inputAmount = inputValue.value;
+        let inputAmount = +inputValue.value;
         inputAmount = adjustedAmount;
 
         const route = await getRoute(inputAmount, normalizedWallet.value?.accountName || "");
@@ -404,7 +404,7 @@ const switchSelected = async () => {
         clone.in = clone.out;
         clone.out = selectedPair.value.in;
 
-        inputValue.value = outputValue.value;
+        inputValue.value = +outputValue.value;
         outputValue.value = undefined;
 
         selectedPair.value = clone;

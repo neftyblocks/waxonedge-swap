@@ -29,15 +29,15 @@ export const getTransferAmount = (
     let adjustedAmount = value;
     let taxAmount = 0;
     let changed = false;
+    let maxAmountToTransfer = balance;
     if (tax) {
-        const total = balance / (1 + tax);
-
+        maxAmountToTransfer = balance / (1 + tax);
         taxAmount = value * tax;
+    }
 
-        if (balance <= value + taxAmount) {
-            adjustedAmount = total;
-            changed = true;
-        }
+    if (balance && balance <= value + taxAmount) {
+        adjustedAmount = maxAmountToTransfer;
+        changed = true;
     }
 
     return {
