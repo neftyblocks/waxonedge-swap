@@ -1,0 +1,139 @@
+:host {
+    --index: var(--waxonedge-index, 0);
+    // space is equal to 10px
+    --space: var(--waxonedge-space, 0.625rem);
+    --space-x: calc(var(--space) * 10);
+
+    --spacing: calc(var(--space) * 2.4);
+    --radius: calc(var(--space) * 1.2);
+
+    // font sizing
+    --font-s: calc(var(--font) * 0.85);
+    --font: var(--waxonedge-font, 0.9rem);
+    --font-m: calc(var(--font) * 1.85);
+
+    // style
+    --theme-bg: var(--waxonedge-bg, #1c2128);
+    --theme-bg-inverted: var(--waxonedge-bg-inverted, #e3e3e3);
+
+    --theme-shadow: var(--waxonedge-shadow, rgba(255, 255, 255, 0.1));
+    --theme-shadow-modal: var(--waxonedge-shadow-modal, rgba(0, 0, 0, 0.5));
+    --theme-shadow-inverted: var(--waxonedge-shadow-inverted, rgba(0, 0, 0, 0.1));
+
+    --theme-highlight: var(--waxonedge-highlight, #10e994);
+
+    --theme-success: var(--waxonedge-success, #12de8d);
+    --theme-error: var(--waxonedge-error, #cd1313);
+    --theme-neutral: var(--waxonedge-neutral, #757f91);
+
+    --theme-toast-bg-success: var(--waxonedge-toast-bg-success, rgba(103, 221, 133, 0.4));
+    --theme-toast-border-success: var(--waxonedge-toast-border-success, rgba(103, 221, 133, 0.7));
+
+    --theme-toast-bg-error: var(--waxonedge-toast-bg-error, rgba(204, 51, 61, 0.4));
+    --theme-toast-border-error: var(--waxonedge-toast-border-error, rgba(204, 51, 61, 0.7));
+
+    --theme-toast-bg-info: var(--waxonedge-toast-bg-info, rgba(8, 182, 245, 0.4));
+    --theme-toast-border-info: var(--waxonedge-border-bg-info, rgba(8, 182, 245, 0.7));
+
+    --theme-toast-bg-soft: var(--waxonedge-toast-bg-soft, rgba(255, 255, 255, 0.1));
+    --theme-toast-border-soft: var(--waxonedge-border-bg-soft, rgba(255, 255, 255, 0.3));
+
+    --theme-toast-bg-warn: var(--waxonedge-toast-bg-warn, rgba(255, 193, 7, 0.4));
+    --theme-toast-border-warn: var(--waxonedge-border-bg-warn, rgba(255, 193, 7, 0.7));
+
+    --theme-green: var(--waxonedge-green, #10e994);
+    --theme-yellow: var(--waxonedge-yellow, #f7d700);
+    --theme-orange: var(--waxonedge-orange, #f79800);
+    --theme-red: var(--waxonedge-red, #cd1313);
+    --theme-white: var(--waxonedge-white, #e3e3e3);
+    --theme-black: var(--waxonedge-black, #1c2128);
+
+    --theme-color: var(--waxonedge-color, #dce1ea);
+    --theme-color-subtle: var(--waxonedge-color-subtle, #757f91);
+    --theme-color-inverted: var(--waxonedge-color-inverted, #1c2128);
+    --theme-color-subtle-inverted: var(--waxonedge-color-subtle-inverted, #535c69);
+
+    --theme-border: var(--waxonedge-border, #344150);
+    --theme-border-inverted: var(--waxonedge-border-inverted, #b6b6b6);
+
+    // input
+    --theme-input: var(--waxonedge-input, #1c2128);
+    --theme-input-color: var(--waxonedge-input-color, #dce1ea);
+    --theme-input-border: var(--waxonedge-input-border, #344150);
+
+    --theme-input-inverted: var(--waxonedge-input-inverted, #ffffff);
+    --theme-input-color-inverted: var(--waxonedge-input-color-inverted, #1c2128);
+    --theme-input-border-inverted: var(--waxonedge-input-border-inverted, #b6b6b6);
+
+    // btn
+    --theme-btn: var(--waxonedge-btn, #1c2128);
+    --theme-btn-color: var(--waxonedge-btn-color, #dce1ea);
+    --theme-btn-border: var(--waxonedge-btn-border, #344150);
+
+    --theme-btn-inverted: var(--waxonedge-btn-inverted, #fafafa);
+    --theme-btn-color-inverted: var(--waxonedge-btn-color-inverted, #1c2128);
+    --theme-btn-border-inverted: var(--waxonedge-btn-border-inverted, #b6b6b6);
+
+    font-family: sans-serif;
+}
+
+main {
+    width: calc(var(--space-x) * 2.5);
+    z-index: var(--index);
+    position: relative;
+
+    --highlight: var(--theme-highlight);
+    --success: var(--theme-success);
+    --error: var(--theme-error);
+    --neutral: var(--theme-neutral);
+    --green: var(--theme-green);
+    --yellow: var(--theme-yellow);
+    --orange: var(--theme-orange);
+    --red: var(--theme-red);
+
+    &.dark {
+        --bg: var(--theme-bg);
+        --color: var(--theme-color);
+        --color-subtle: var(--theme-color-subtle);
+        --border: var(--theme-border);
+        --shadow: var(--theme-shadow);
+        --shadow-modal: var(--theme-shadow-modal);
+
+        --btn: var(--theme-btn);
+        --btn-color: var(--theme-btn-color);
+        --btn-border: var(--theme-btn-border);
+
+        --input: var(--theme-input);
+        --input-color: var(--theme-input-color);
+        --input-border: var(--theme-input-border);
+    }
+
+    &.light {
+        --bg: var(--theme-bg-inverted);
+        --color: var(--theme-color-inverted);
+        --color-subtle: var(--theme-color-subtle-inverted);
+        --border: var(--theme-border-inverted);
+        --shadow: var(--theme-shadow-inverted);
+        --shadow-modal: var(--theme-shadow-modal);
+
+        --btn: var(--theme-btn-inverted);
+        --btn-color: var(--theme-btn-color-inverted);
+        --btn-border: var(--theme-btn-border-inverted);
+
+        --input: var(--theme-input-inverted);
+        --input-color: var(--theme-input-color-inverted);
+        --input-border: var(--theme-input-border-inverted);
+    }
+}
+
+@media all and (min-width: 350px) {
+    main {
+        width: calc(var(--space-x) * 3);
+    }
+}
+
+@media all and (min-width: 500px) {
+    main {
+        width: calc(var(--space-x) * 4);
+    }
+}

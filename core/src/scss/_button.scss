@@ -42,6 +42,10 @@
         opacity: 0.8;
     }
 
+    &:focus {
+        outline: 1px solid var(--btn-color);
+    }
+
     &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
@@ -53,5 +57,35 @@
 
     &--big {
         padding: calc(var(--space) * 1) calc(var(--space) * 2.4);
+    }
+
+    &--link {
+        background: none;
+        border: none;
+        padding: 0;
+        text-decoration: underline;
+        cursor: pointer;
+        border-radius: none;
+        display: inline;
+        outline: none;
+        transition: none;
+
+        &:active {
+            transform: none;
+            opacity: 1;
+        }
+
+        &:focus {
+            outline: none;
+        }
+
+        &:hover {
+            text-decoration: none;
+            border-color: unset;
+        }
+    }
+
+    &--top-spaced {
+        margin-top: var(--spacing);
     }
 }

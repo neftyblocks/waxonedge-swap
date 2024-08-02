@@ -1,13 +1,12 @@
 <template>
-    <waxonedge-swap
+    <waxonedge-liquidity
         theme="dark"
-        :chart="false"
         :wallet="wallet"
         :signing="signing"
-        :lock="locked"
+        :lock="lockedLiquidity"
         @connect="connectEvent"
         @sign="signTransaction"
-    ></waxonedge-swap>
+    ></waxonedge-liquidity>
 </template>
 
 <script setup lang="ts">
@@ -16,19 +15,20 @@
 // component is registered.
 
 import { defineCustomElement, ref } from "vue";
-import Swap from "./components/Swap.ce.vue";
+import Liquidity from "./components/Liquidity.ce.vue";
 import type { Wallet } from "waxonedge-core";
 
-const SwapElement = defineCustomElement(Swap);
+const LiquidityElement = defineCustomElement(Liquidity);
 
-customElements.define("waxonedge-swap", SwapElement);
+customElements.define("waxonedge-liquidity", LiquidityElement);
 
 const wallet = ref<Wallet | null>(null);
 
-const locked = {
-    // in: "usdt.alcor_USDT,token.nefty_NEFTY,eosio.token_WAX",
-    // out: "usdt.alcor_USDT,token.nefty_NEFTY,eosio.token_WAX",
+const lockedLiquidity = {
+    // in: "usdt.alcor_USDT",
+    // out: "eosio.token_WAX",
 };
+
 const signing = ref(false);
 
 const connectEvent = () => {

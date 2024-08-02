@@ -1,18 +1,18 @@
-# WaxOnEdge Swap
+# WaxOnEdge Liquidity
 
-[![npm bundle size](https://img.shields.io/bundlephobia/min/@waxonedge/swap?style=flat)](https://www.npmjs.org/package/@waxonedge/swap)
-[![npm](https://img.shields.io/npm/dw/@waxonedge/swap?style=flat)](https://www.npmjs.org/package/@waxonedge/swap)
-[![npm](https://img.shields.io/npm/v/@waxonedge/swap?style=flat)](https://www.npmjs.org/package/@waxonedge/swap)
+[![npm bundle size](https://img.shields.io/bundlephobia/min/@waxonedge/liquidity?style=flat)](https://www.npmjs.org/package/@waxonedge/liquidity)
+[![npm](https://img.shields.io/npm/dw/@waxonedge/liquidity?style=flat)](https://www.npmjs.org/package/@waxonedge/liquidity)
+[![npm](https://img.shields.io/npm/v/@waxonedge/liquidity?style=flat)](https://www.npmjs.org/package/@waxonedge/liquidity)
 
 > ⚠️ This component is still in development and we will change how it works until we have hit a stable V1.0.0.
 
-A component for swapping tokens in the WAX ecosystem. the component is created to use the WaxOnEdge system for optimal routing and best in class swapping.
+A component to add liquidity to tokens in the WAX ecosystem. the component is created to use the NeftyBlocks swap contract.
 
 #### What does this component include?
 
 -   🎨 Customizable look (dark and light theme included)
--   💲 Swapping all WAX tokens
--   📈 Chart for tokens trend (Optional)
+-   💧 Add liquidity to existing pairs
+-   💲 Create new pairs
 -   🚀 Easy signable transaction (wallet login not included)
 
 ## 🚀 Usage
@@ -25,32 +25,32 @@ First of all, you need to install the library:
 
 ```bash
     # install dependencies
-    $ npm i @waxonedge/swap
+    $ npm i @waxonedge/liquidity
 
     # pnpm
-    $ pnpm add @waxonedge/swap
+    $ pnpm add @waxonedge/liquidity
 
     # or yarn
-    $ yarn add @waxonedge/swap
+    $ yarn add @waxonedge/liquidity
 ```
 
 2. Include in your javascript/typescript file:
 
 ```js
-import "@waxonedge/swap";
+import "@waxonedge/liquidity";
 
 // or if vue@^3.x.x is already used in your code
-import "@waxonedge/swap/dist/vueless";
+import "@waxonedge/liquidity/dist/vueless";
 ```
 
-3. Place in your HTML where you want to embed the market:
+3. Place in your HTML where you want to embed the component:
 
 ```html
-<waxonedge-swap theme="dark" chart="true"></waxonedge-swap>
+<waxonedge-liquidity theme="dark"></waxonedge-liquidity>
 ```
 
 ```js
-const component = document.querySelector("waxonedge-swap");
+const component = document.querySelector("waxonedge-liquidity");
 
 // user wants to connect wallet
 component.addEventListener("connect", () => {});
@@ -74,32 +74,32 @@ Options are placed the element as `attributes` with a `value`.
 which looks as follows:
 
 ```html
-<waxonedge-swap theme="dark" chart="true"></waxonedge-swap>
+<waxonedge-liquidity theme="dark"></waxonedge-liquidity>
 ```
 
-| Attribute | Value                     | Default | Description                                                                    |
-| --------- | ------------------------- | ------- | ------------------------------------------------------------------------------ |
-| `theme`   | `light \ dark`            | `dark`  | which color scheme it should use.                                              |
-| `chart`   | `boolean`                 | `false` | shows a small chart with 48 hour token info. **WORK IN PROGRESS**              |
-| `wallet`  | [see wallet type](#types) | None    | the user wallet to create actions and get balances from.                       |
-| `lock`    | [see lock type](#types)   | None    | lock in and output tokens.                                                     |
-| `signing` | `boolean`                 | `false` | letting the component know that it is signing. and should show a loading state |
-| `config`  | [see config type](#types) | None    | custom config for **DEVELOPMENT**                                              |
+| Attribute | Value                     | Default | Description                                                                                  |
+| --------- | ------------------------- | ------- | -------------------------------------------------------------------------------------------- |
+| `theme`   | `light \ dark`            | `dark`  | which color scheme it should use.                                                            |
+| `chart`   | `boolean`                 | `false` | shows a small chart with 48 hour token info. **WORK IN PROGRESS**                            |
+| `wallet`  | [see wallet type](#types) | None    | the user wallet to create actions and get balances from.                                     |
+| `lock`    | [see lock type](#types)   | None    | lock in and output tokens.                                                                   |
+| `signing` | `boolean`                 | `false` | letting the component know that it is signing a transaction. and should show a loading state |
+| `config`  | [see config type](#types) | None    | custom config for **DEVELOPMENT**                                                            |
 
 ## 🙌 Events
 
 Events are placed the element as `listeners`.
 
 ```js
-const component = document.querySelector("waxonedge-swap");
+const component = document.querySelector("waxonedge-liquidity");
 
 component.addEventListener("connect", () => {});
 ```
 
-| event     | Value                   | Description                                                                 |
-| --------- | ----------------------- | --------------------------------------------------------------------------- |
-| `connect` | `void`                  | buttons to connect wallet has been pressed (if wallet attribute is empty)   |
-| `sign`    | [see sign type](#types) | button to swap has been pressed and the user wants to sign the transaction. |
+| event     | Value                   | Description                                                                          |
+| --------- | ----------------------- | ------------------------------------------------------------------------------------ |
+| `connect` | `void`                  | buttons to connect wallet has been pressed (if wallet attribute is empty)            |
+| `sign`    | [see sign type](#types) | button to add liquidity has been pressed and the user wants to sign the transaction. |
 
 ### types
 
@@ -236,7 +236,7 @@ For more options we partially support the use of `::part` which will give you fu
 To see what you can style look at the HTML in the inspector and look for the attribute `part="..."`
 
 ```css
-waxonedge-swap::part(part-name) {
+waxonedge-liquidity::part(part-name) {
     /* override the styling */
 }
 ```

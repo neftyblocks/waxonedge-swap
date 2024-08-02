@@ -1,13 +1,10 @@
 {
-    "name": "@waxonedge/swap",
+    "name": "@waxonedge/liquidity",
     "private": false,
-    "version": "0.5.3",
+    "version": "0.1.7",
     "type": "module",
     "browser": "dist/main.cjs",
     "module": "dist/main.mjs",
-    "files": [
-        "dist"
-    ],
     "exports": {
         ".": {
             "require": "./dist/main.cjs",
@@ -24,7 +21,8 @@
         "url": "https://waxonedge.app/"
     },
     "contributors": [
-        "Max van der Schee"
+        "Max van der Schee",
+        "José Andrade"
     ],
     "scripts": {
         "dev": "vite",

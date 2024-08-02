@@ -1,11 +1,11 @@
-import { useFetch } from "@nefty/use";
-import { type Ref, ref, watch } from "vue";
+import { Ref, ref, watch } from "vue";
 import type { BalanceAPI, Balances, TokenItem, Wallet } from "../types";
+import { useFetch } from "@nefty/use";
 import { useConfig } from "./config";
 
 const balances = ref<Balances | null>(null);
 
-export const useAccount = (wallet: Ref<Wallet | null>) => {
+export const useAccount = (wallet: Ref<Wallet | null | undefined>) => {
     const updateBalances = async () => {
         if (wallet.value) {
             balances.value = await getBalances(wallet.value?.accountName || "");
@@ -40,7 +40,13 @@ export const useAccount = (wallet: Ref<Wallet | null>) => {
 
         const keys = Object.keys(balances.value);
 
-        return keys.slice(0, 30);
+        return keys.slice(0, 100);
+    };
+
+    const getBalancesList = () => {
+        if (!balances.value) return [];
+
+        return Object.values(balances.value);
     };
 
     return {
@@ -49,6 +55,7 @@ export const useAccount = (wallet: Ref<Wallet | null>) => {
         getValueByToken,
         getPresetBalance,
         getBalanceByToken,
+        getBalancesList,
     };
 };
 
@@ -64,14 +71,23 @@ const getBalances = async (accountName: string): Promise<Balances> => {
     });
 
     if (!error && data) {
-        const sortBalancesByAmount = data.sort((a, b) => +b.usdValue - +a.usdValue);
+        const sortBalancesByAmount = data.sort((a, b) =>
+            +b.usdValue > 0 && +a.usdValue > 0 ? +b.usdValue - +a.usdValue : +b.amount - +a.amount
+        );
 
         for (let i = 0; i < sortBalancesByAmount.length; i++) {
-            const { amount, contract, currency, usdValue } = sortBalancesByAmount[i];
+            const { amount, contract, currency, usdValue, decimals, tax, logo } = sortBalancesByAmount[i];
 
             result[`${contract}_${currency}`] = {
                 amount: +amount,
                 usdValue: +usdValue,
+                token: {
+                    contract,
+                    ticker: currency,
+                    precision: +decimals,
+                    tax,
+                    logo,
+                },
             };
         }
     }

@@ -1,7 +1,8 @@
 import { useFetch } from "@nefty/use";
 import { ref } from "vue";
-import type { OHLCVCustom } from "../types";
+import type { OHLCVCustom, TableRowsApi } from "../types";
 import { useConfig } from "./config";
+import { limitPrecision } from "../utils";
 
 const cache = ref<Record<string, OHLCVCustom[]>>({});
 
@@ -62,9 +63,38 @@ export const useCandles = () => {
         return 0;
     };
 
+    const getUsdRate = async (): Promise<number> => {
+        const [config] = useConfig();
+        const { data, error } = await useFetch<TableRowsApi>("/v1/chain/get_table_rows", {
+            baseUrl: config.CHAIN_API,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: {
+                json: true,
+                index_position: 3,
+                key_type: "i64",
+                code: "delphioracle",
+                scope: "waxpusd",
+                table: "datapoints",
+                limit: 1,
+                reverse: true,
+                show_payer: false,
+            },
+        });
+
+        if (!error && data) {
+            const { rows } = data;
+
+            return rows[0] ? limitPrecision(rows[0].median / 10000) : 0;
+        }
+
+        return 0;
+    };
+
     return {
         cache,
         getLastPrice,
         getCandle,
+        getUsdRate,
     };
 };

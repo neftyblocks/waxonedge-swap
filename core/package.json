@@ -1,0 +1,32 @@
+{
+    "name": "waxonedge-core",
+    "private": false,
+    "version": "0.0.1",
+    "main": "./dist/waxonedge-core.umd.cjs",
+    "module": "./dist/waxonedge-core.js",
+    "type": "module",
+    "files": [
+        "dist"
+    ],
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/waxonedge-core.js",
+            "require": "./dist/waxonedge-core.umd.cjs"
+        },
+        "./style.css": "./dist/style.css"
+    },
+    "author": {
+        "name": "WaxOneEdge",
+        "email": "contact@waxonedge.app",
+        "url": "https://waxonedge.app/"
+    },
+    "contributors": [
+        "Max van der Schee",
+        "José Andrade"
+    ],
+    "scripts": {
+        "dev": "vite",
+        "build": "vue-tsc --emitDeclarationOnly && vite build"
+    }
+}

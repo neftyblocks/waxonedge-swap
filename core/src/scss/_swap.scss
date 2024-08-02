@@ -50,7 +50,7 @@
 
 .swap-container {
     width: 100%;
-    height: calc(var(--space-x) * 3.7);
+    min-height: calc(var(--space-x) * 3.7);
     padding: var(--spacing);
     background-color: var(--bg);
     color: var(--color);
@@ -154,18 +154,39 @@
 
         &.green {
             color: var(--green);
+
+            button {
+                color: var(--green);
+            }
         }
 
         &.yellow {
             color: var(--yellow);
+
+            button {
+                color: var(--yellow);
+            }
         }
 
         &.orange {
             color: var(--orange);
+
+            button {
+                color: var(--orange);
+            }
         }
 
         &.red {
             color: var(--red);
+
+            button {
+                color: var(--red);
+            }
+        }
+
+        button {
+            color: var(--color-subtle);
+            font-size: var(--font);
         }
     }
 }
