@@ -490,7 +490,7 @@ const addLiquidity = () => {
     const pool1 = selectedPair.value.in;
     const pool2 = selectedPair.value.out;
 
-    const poolKey = `${pool1.ticker}@${pool1.contract}-${pool2.ticker}@${pool2.contract}`;
+    const poolKey = `${pool1.precision},${pool1.ticker}@${pool1.contract}-${pool2.precision},${pool2.ticker}@${pool2.contract}`;
     const pairSource = selectedPair.value.source;
     const depositMemo = `deposit_to_pair:${poolKey}`;
 
