@@ -1,11 +1,12 @@
-import { computed, Ref, toRef, unref } from "vue";
+import { computed, Ref, toRef } from "vue";
 
 export const normalizedBoolean = (value: Ref<any>): Ref<boolean> => {
-    const unrefValue = unref(value);
+    const valueRef = toRef(value);
     return computed(() => {
-        if (typeof unrefValue === "string") return unrefValue === "true" ? true : unrefValue === "" ? true : false;
+        if (typeof valueRef.value === "string")
+            return valueRef.value === "true" ? true : valueRef.value === "" ? true : false;
 
-        return unrefValue;
+        return valueRef.value;
     });
 };
 

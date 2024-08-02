@@ -1,7 +1,7 @@
 {
     "name": "@waxonedge/swap",
     "private": false,
-    "version": "0.5.1",
+    "version": "0.5.2",
     "type": "module",
     "browser": "dist/main.cjs",
     "module": "dist/main.mjs",
