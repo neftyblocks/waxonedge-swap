@@ -25,7 +25,7 @@
             <template v-else> {{ displayUSD }} --- </template>
         </small>
     </div>
-    <small v-if="amount && taxAmount && token" class="swap-tax"
+    <small v-if="isInput && amount && taxAmount && token" class="swap-tax"
         >total cost: {{ prettyFormatNumber(+amount) }} {{ token.ticker }} + {{ prettyFormatNumber(taxAmount) }}
         {{ token.ticker }} ({{ prettyFormatNumber(token.tax * 100) }}% fee)
     </small>

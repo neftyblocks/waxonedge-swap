@@ -445,8 +445,8 @@ const switchSelected = async () => {
         inverted.value = !inverted.value;
         loading.value = true;
 
-        const newOutput = +inputValue.value;
-        inputValue.value = +outputValue.value;
+        const newOutput = inputValue.value;
+        inputValue.value = outputValue.value;
         outputValue.value = newOutput;
 
         const newTokenOut = tokenIn.value;
