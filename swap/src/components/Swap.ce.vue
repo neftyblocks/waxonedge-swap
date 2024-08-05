@@ -404,7 +404,7 @@ const switchSelected = async () => {
         clone.in = clone.out;
         clone.out = selectedPair.value.in;
 
-        inputValue.value = +outputValue.value;
+        inputValue.value = outputValue.value;
         outputValue.value = undefined;
 
         selectedPair.value = clone;
